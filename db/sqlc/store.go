@@ -7,21 +7,25 @@ import (
 )
 
 //处理事务
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+}
 
-type Store struct {
+type SQLStore struct {
 	*Queries //支持Queries的数据库操作
 	db       *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
 //事务函数,闭包处理
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	//开始事务
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -56,7 +60,7 @@ type TransferTxResult struct {
 }
 
 //transer事务处理,发生交易，需要更新account表的balance，添加entry记录(from/to)
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
