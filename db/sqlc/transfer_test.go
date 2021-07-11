@@ -15,7 +15,7 @@ import (
 func creatRadomTransfer(t *testing.T) Transfer {
 	//创建一批随机账号
 	for i := 0; i < 10; i++ {
-		creatRadomAccount(t)
+		creatRandomAccount(t)
 	}
 	//获取随机账号
 	arg1 := ListAccountsParams{
@@ -28,9 +28,9 @@ func creatRadomTransfer(t *testing.T) Transfer {
 	require.Len(t, accounts, 5)
 
 	arg2 := CreateTransferParams{
-		FromAccountID: accounts[util.RandInt(0, 4)].ID,
-		ToAccountID:   accounts[util.RandInt(0, 4)].ID,
-		Amount:        util.RandMoney(),
+		FromAccountID: accounts[util.RandomInt(0, 4)].ID,
+		ToAccountID:   accounts[util.RandomInt(0, 4)].ID,
+		Amount:        util.RandomMoney(),
 	}
 
 	transfer, err := testQueries.CreateTransfer(context.Background(), arg2)
@@ -71,7 +71,7 @@ func TestUpdateTransfer(t *testing.T) {
 	transfer1 := creatRadomTransfer(t)
 	arg := UpdateTransferParams{
 		ID:     transfer1.ID,
-		Amount: util.RandMoney(),
+		Amount: util.RandomMoney(),
 	}
 	transfer2, err := testQueries.UpdateTransfer(context.Background(), arg)
 	require.NoError(t, err)

@@ -12,11 +12,11 @@ import (
 )
 
 // creatRadomAccount
-func creatRadomAccount(t *testing.T) Account {
+func creatRandomAccount(t *testing.T) Account {
 	arg := CreateAccountParams{
-		Owner:    util.RandOwner(),
-		Balance:  util.RandMoney(),
-		Currency: util.RandCurrency(),
+		Owner:    util.RandomOwner(),
+		Balance:  util.RandomMoney(),
+		Currency: util.RandomCurrency(),
 	}
 
 	account, err := testQueries.CreateAccount(context.Background(), arg)
@@ -32,12 +32,12 @@ func creatRadomAccount(t *testing.T) Account {
 }
 
 func TestCreateAccount(t *testing.T) {
-	creatRadomAccount(t)
+	creatRandomAccount(t)
 }
 
 //test GetAccount
 func TestGetAccount(t *testing.T) {
-	account1 := creatRadomAccount(t)
+	account1 := creatRandomAccount(t)
 	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
 
 	require.NoError(t, err)
@@ -54,10 +54,10 @@ func TestGetAccount(t *testing.T) {
 
 //test UpdateAccount
 func TestUpdateAccount(t *testing.T) {
-	account1 := creatRadomAccount(t)
+	account1 := creatRandomAccount(t)
 	arg := UpdateAccountParams{
 		ID:      account1.ID,
-		Balance: util.RandMoney(),
+		Balance: util.RandomMoney(),
 	}
 	account2, err := testQueries.UpdateAccount(context.Background(), arg)
 	require.NoError(t, err)
@@ -74,7 +74,7 @@ func TestUpdateAccount(t *testing.T) {
 //test Delete
 
 func TestDeleteAccount(t *testing.T) {
-	account1 := creatRadomAccount(t)
+	account1 := creatRandomAccount(t)
 	err := testQueries.DeleteAccount(context.Background(), account1.ID)
 	require.NoError(t, err)
 
@@ -88,7 +88,7 @@ func TestDeleteAccount(t *testing.T) {
 
 func TestListAccount(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		creatRadomAccount(t)
+		creatRandomAccount(t)
 	}
 	arg := ListAccountsParams{
 		Limit:  5,

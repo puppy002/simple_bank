@@ -9,8 +9,8 @@ import (
 
 func TestTransferTx(t *testing.T) {
 	store := NewStore(testDB)
-	account1 := creatRadomAccount(t)
-	account2 := creatRadomAccount(t)
+	account1 := creatRandomAccount(t)
+	account2 := creatRandomAccount(t)
 
 	//Run
 

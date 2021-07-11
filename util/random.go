@@ -13,13 +13,13 @@ func init() {
 }
 
 //随机Int64
-func RandInt(min, max int64) int64 {
+func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }
 
 //随机string
 
-func RandString(n int) string {
+func RandomString(n int) string {
 	var sb strings.Builder
 	k := len(alphabet)
 
@@ -30,18 +30,16 @@ func RandString(n int) string {
 	return sb.String()
 }
 
-
-
-func RandOwner() string {
-	return RandString(6)
+func RandomOwner() string {
+	return RandomString(6)
 }
 
 //随机金额
-func RandMoney() int64 {
-	return RandInt(0, 1000)
+func RandomMoney() int64 {
+	return RandomInt(0, 1000)
 }
 
-func RandCurrency() string {
+func RandomCurrency() string {
 	currencies := []string{"USD", "EUR", "RMB", "CAD"}
 	n := len(currencies)
 	return currencies[rand.Intn(n)]

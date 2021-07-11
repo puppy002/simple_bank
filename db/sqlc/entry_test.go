@@ -15,7 +15,7 @@ import (
 func creatRadomEntry(t *testing.T) Entry {
 	//创建一批随机账号
 	for i := 0; i < 10; i++ {
-		creatRadomAccount(t)
+		creatRandomAccount(t)
 	}
 	//获取随机账号
 	arg1 := ListAccountsParams{
@@ -27,8 +27,8 @@ func creatRadomEntry(t *testing.T) Entry {
 	require.Len(t, accounts, 5)
 
 	arg2 := CreateEntryParams{
-		AccountID: accounts[util.RandInt(0, 4)].ID,
-		Amount:    util.RandMoney(),
+		AccountID: accounts[util.RandomInt(0, 4)].ID,
+		Amount:    util.RandomMoney(),
 	}
 
 	entry, err := testQueries.CreateEntry(context.Background(), arg2)
@@ -67,7 +67,7 @@ func TestUpdateEntry(t *testing.T) {
 	entry1 := creatRadomEntry(t)
 	arg := UpdateEntryParams{
 		ID:     entry1.ID,
-		Amount: util.RandMoney(),
+		Amount: util.RandomMoney(),
 	}
 	entry2, err := testQueries.UpdateEntry(context.Background(), arg)
 	require.NoError(t, err)
