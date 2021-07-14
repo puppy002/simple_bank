@@ -49,6 +49,7 @@ func EqCreateUserParams(arg db.CreateUserParams, password string) gomock.Matcher
 }
 
 func TestCreateUserAPI(t *testing.T) {
+	//随机用户
 	user, password := randomUser(t)
 
 	testCases := []struct {
@@ -76,6 +77,7 @@ func TestCreateUserAPI(t *testing.T) {
 					Times(1).
 					Return(user, nil)
 			},
+
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 				requireBodyMatchUser(t, recorder.Body, user)
@@ -188,7 +190,7 @@ func TestCreateUserAPI(t *testing.T) {
 			require.NoError(t, err)
 
 			url := "/users"
-			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+			request := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			require.NoError(t, err)
 
 			server.router.ServeHTTP(recorder, request)
@@ -307,7 +309,7 @@ func TestLoginUserAPI(t *testing.T) {
 			require.NoError(t, err)
 
 			url := "/users/login"
-			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+			request := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			require.NoError(t, err)
 
 			server.router.ServeHTTP(recorder, request)

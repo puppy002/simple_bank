@@ -6,17 +6,19 @@ import (
 	"fmt"
 )
 
-//处理事务
+// Store defines all functions to execute db queries and transactions
 type Store interface {
 	Querier
 	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
 }
 
+// SQLStore provides all functions to execute SQL queries and transactions
 type SQLStore struct {
-	*Queries //支持Queries的数据库操作
-	db       *sql.DB
+	db *sql.DB
+	*Queries
 }
 
+// NewStore creates a new store
 func NewStore(db *sql.DB) Store {
 	return &SQLStore{
 		db:      db,
@@ -24,33 +26,33 @@ func NewStore(db *sql.DB) Store {
 	}
 }
 
-//事务函数,闭包处理
+// ExecTx executes a function within a database transaction
 func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
-	//开始事务
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
+
 	q := New(tx)
 	err = fn(q)
 	if err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("tx err:%v,rb err:%v", err, rbErr)
+			return fmt.Errorf("tx err: %v, rb err: %v", err, rbErr)
 		}
 		return err
 	}
-	//提交事务
+
 	return tx.Commit()
 }
 
-//用于储存Transfer事务的参数
+// TransferTxParams contains the input parameters of the transfer transaction
 type TransferTxParams struct {
 	FromAccountID int64 `json:"from_account_id"`
 	ToAccountID   int64 `json:"to_account_id"`
 	Amount        int64 `json:"amount"`
 }
 
-//用于储存Transfer事务的result
+// TransferTxResult is the result of the transfer transaction
 type TransferTxResult struct {
 	Transfer    Transfer `json:"transfer"`
 	FromAccount Account  `json:"from_account"`
@@ -59,19 +61,23 @@ type TransferTxResult struct {
 	ToEntry     Entry    `json:"to_entry"`
 }
 
-//transer事务处理,发生交易，需要更新account表的balance，添加entry记录(from/to)
+// TransferTx performs a money transfer from one account to the other.
+// It creates the transfer, add account entries, and update accounts' balance within a database transaction
 func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
-		//添加转账记录
 		var err error
 
-		result.Transfer, err = q.CreateTransfer(ctx, CreateTransferParams(arg))
+		result.Transfer, err = q.CreateTransfer(ctx, CreateTransferParams{
+			FromAccountID: arg.FromAccountID,
+			ToAccountID:   arg.ToAccountID,
+			Amount:        arg.Amount,
+		})
 		if err != nil {
 			return err
 		}
-		//添加对FromAccountId交易记录
+
 		result.FromEntry, err = q.CreateEntry(ctx, CreateEntryParams{
 			AccountID: arg.FromAccountID,
 			Amount:    -arg.Amount,
@@ -79,7 +85,7 @@ func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (Tr
 		if err != nil {
 			return err
 		}
-		//添加对ToAccountId交易记录
+
 		result.ToEntry, err = q.CreateEntry(ctx, CreateEntryParams{
 			AccountID: arg.ToAccountID,
 			Amount:    arg.Amount,
@@ -96,6 +102,7 @@ func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (Tr
 
 		return err
 	})
+
 	return result, err
 }
 

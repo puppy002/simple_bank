@@ -4,15 +4,13 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/puppy002/simple_bank/util"
-
 	_ "github.com/lib/pq"
 	"github.com/puppy002/simple_bank/api"
 	db "github.com/puppy002/simple_bank/db/sqlc"
+	"github.com/puppy002/simple_bank/util"
 )
 
 func main() {
-
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
@@ -22,12 +20,15 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
+
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatal("cannot create server:", err)
+	}
 
 	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
-
 }
