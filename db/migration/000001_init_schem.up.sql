@@ -1,3 +1,4 @@
+--创建账号表
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
   "owner" varchar NOT NULL,
@@ -20,7 +21,7 @@ CREATE TABLE "transfers" (
   "amount" bigint NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
-
+--外键
 ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 
 ALTER TABLE "transfers" ADD FOREIGN KEY ("from_account_id") REFERENCES "accounts" ("id");

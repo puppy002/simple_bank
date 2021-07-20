@@ -2,7 +2,12 @@ network:
 	docker network create bank-network
 
 postgres:
-	docker run --name postgres12 --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
+	docker run --name postgres12 --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -e TZ=Asia/Shanghai -d postgres:12-alpine
+
+mongo:
+	docker run --name mongo4 --network bank-network -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=secret -d mongo:4.0
+
+
 
 mysql:
 	docker run --name mysql8 -p 3306:3306  -e MYSQL_ROOT_PASSWORD=secret -d mysql:8
@@ -37,4 +42,4 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/puppy002/simple_bank/db/sqlc Store
 
-.PHONY: network postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlc test server mock
+.PHONY: network postgres mongo mysql createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlc test server mock
